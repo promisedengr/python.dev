@@ -1,0 +1,81 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | HRV SciHub</title>
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/preloader.css' %}">
+    <script src="{% static 'assets/js/preloader.js' %}"></script>
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.svg' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'assets/css/app.css' %}">
+    
+</head>
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+<body>
+    <div id="auth">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7 col-sm-12 mx-auto">
+                    <div class="card pt-4">
+                        <div class="card-body">
+                            <div class="text-center mb-5">
+                                <h3>Sign Up</h3>
+                                <p>Please fill the form to register.</p>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            <label for="{{ form.username.id_for_label }}">Username</label>
+                                            {{ form.username|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            <label for="{{ form.email.id_for_label }}">Email</label>
+                                            {{ form.email|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            <label for="{{ form.password1.id_for_label }}">Password</label>
+                                            {{ form.password1|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                                            {{ form.password2|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                </diV>
+
+                                <a href="{% url 'login' %}">Have an account? Login</a>
+                                <div class="clearfix">
+                                    <button class="btn btn-primary float-right">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>   
+
+    <script src="{% static 'assets/js/feather-icons/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+</body>
+
+</html>

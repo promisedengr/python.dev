@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activation invalid</title>
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}">
+    
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.svg' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'assets/css/app.css' %}">
+</head>
+<body>
+    <div id="error">        
+        <div class="container text-center pt-32">
+            <img src="{% static 'assets/images/logo.svg' %}" height="48" class='mb-4'>
+            <h4 class='title mt-5'>The confirmation link was invalid, possibly because it has already been used.</h4>
+            <div class="container">
+                <div>
+                    <a class="btn btn-sm btn-primary mt-2" href="{% url 'signup' %}"> Sign up </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer pt-32">
+            <p class="text-center">Copyright &copy; HRVSciHub 2021</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-0" id="viewContainer">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3 class="capitalize">{{ subject.name }}</h3>
+                <p class="text-subtitle text-muted">Sample list</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class='breadcrumb-header mb-3'>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'subject_list' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Samples</li>
+                    </ol>
+                </nav>
+                <div class="d-flex justify-content-md-end justify-content-center">
+                    <div class="col-md-6 col-sm-8 col-12">
+                        <div class="input-group mb-4">
+                            <span class="input-group-text" id="basic-addon1"><i data-feather="search"></i></span>
+                            <input id="filterSample" type="text" class="form-control" placeholder="Search sample..." aria-label="Search sample"
+                                aria-describedby="button-addon2">
+                        </div>                    
+                    </div>                    
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-{{msg.tags}} alert-dismissible fade show" role="alert">
+        {{msg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div id="alertMsg"></div>
+    <div class="view-content active" id="sampleView">
+        <div class="row" id="sample-wrapper">
+            <!-- sample list -->
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="card border">
+                    <div class="card-body text-center" id="uploadFile">
+                        <span>
+                            <img src="{% static 'assets/images/icons/file.svg' %}" alt="upload icon">
+                        </span>
+                        <h2 class="text-secondary m-2">New</h2>
+                    </div>
+                    <div class="card-footer border-top">
+                        <span><i data-feather="upload"></i>&nbsp;Upload</span>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-12 col-md-4 col-lg-3 d-none" id="selectFiles">
+                <div>
+                    <div class="card card-body">
+                        <form method="POST" action="{% url 'preview_file' subject.pk %}" id="fileForm"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="input-group mb-3" id="signalData">
+                                <div class="custom-file">
+                                    <label class="custom-file-label font-weight-bold" for="inputFileSignal">Choose ECG
+                                        File:</label>
+                                    <input type="file" class="custom-file-input form-control" accept=".txt"
+                                        id="inputFileSignal" aria-describedby="ecgFiles" name="ecgFiles" multiple>
+
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-3" id="nniData">
+                                <div class="custom-file">
+                                    <label class="custom-file-label font-weight-bold" for="inputNNIfile">Choose RR
+                                        File:</label>
+                                    <input type="file" accept=".csv, .txt" class="custom-file-input form-control"
+                                        id="inputNNIfile" aria-describedby="nniFiles" name="nniFiles" multiple>
+
+                                </div>
+                            </div>
+                            <div class="form-group d-none" id="submitfilebtn">
+                                <button id="btnFileSubmit" type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% for sample in subject.samples.all %}
+            <div class="col-12 col-md-4 col-lg-3 sampleCard">
+                <div class="card border">
+                    {% if sample.result %}
+                    <a class="text-decoration-none text-secondary" href="{% url 'analysis_board' sample.pk %}">
+                        <div class="card-body text-center file-card">
+
+                            <span>
+                                <img src="{% static 'analysis/img/icons/file-text.svg' %}" alt="file icon">
+                            </span>
+                            <h2 class="text-secondary m-2">{{ sample.comment }}</h2>
+
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="card-body text-center file-card">
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">Computing...</span>
+                        </div>
+                        <p>We will notify you via email once the results are ready</p>
+                    </div>
+                    {% endif %}
+                    <div class="card-footer border-top">
+                        <div class="d-flex justify-content-around align-items-center">
+                            <span>{{ sample.last_modified | naturaltime }}</span>
+                            <form class="deleteSampleForm" id="{% url 'sample-detail' sample.pk %}">
+                                <button class="btn btn-sm text-primary" data-toggle="tooltip" data-placement="bottom"
+                                    title="delete sample" type="submit"><span><i
+                                            data-feather="trash-2"></i></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}
+{% block scripts %}
+<script src="{% static 'analysis/js/subject-detail.js' %}"></script>
+{% endblock scripts %}

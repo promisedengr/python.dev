@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3>Preview data</h3>
+            <p>Make sure there is only one header row for each file</p>
+        </div>
+    </div>
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-{{msg.tags}} alert-dismissible fade show" role="alert">
+                {{msg}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+        {% endfor %}
+    {% endif %}
+    <div id="alertMsg"></div>
+    <div>
+        <a class="d-none" id="apiEndPointSubject" href="{% url 'subject-detail' subject.pk %}"></a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-12 order-12 order-md-1">
+            {% if data_preview %}
+                {% for key, val in data_preview.items %}
+                    <div class="container text-center">
+                        <h4>{{key}}</h4>
+                    </div>
+                    <div id="data-preview" class="table-responsive mb-3">
+                        <div class="container">
+                            {{ val|safe }}
+                        </div>
+
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-4 col-sm-6 col-12  order-1 order-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Data Specifications
+                </div>
+                <div class="card-body">
+                    <form class="form-inline" id="createSampleForm">
+                        <div class="form-group">
+                            <div class="form-group mb-3">
+                                <label for="sampleComment" class="form-label">Comment</label>
+                                <textarea class="form-control" id="sampleComment" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-6 col-12 mb-2"><button class="btn btn-secondary btn-block">Submit</button></div>
+                                <div class="col-lg-6 col-12 mb-2"><a id="sampleListUrl" class="btn btn-primary btn-block"
+                                    href="{% url 'subject_sample_list' subject.pk %}">Discard</a></div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+    // initialize the scrollbar
+    if (typeof PerfectScrollbar == 'function') {
+        let container = document.querySelector("#data-preview");
+        let ps = new PerfectScrollbar(container);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    var nni_data = JSON.parse("{{nni_data|escapejs}}");
+    var subject_api_url = document.getElementById('apiEndPointSubject').href;
+    var sample_list_url = document.getElementById('sampleListUrl').href;
+
+    function displayLoading() {
+        document.querySelector('body').classList.remove("loaded");
+        var elem = document.querySelector('#loader-wrapper .loader-msg');
+        elem.classList.remove("d-none");
+    }
+
+    form = document.getElementById("createSampleForm");
+    for (let item in nni_data) {
+        form.addEventListener('submit', e => {
+        e.preventDefault();
+        let url = "{% url 'sample-list' %}";
+        const comment = document.getElementById('sampleComment').value
+        displayLoading();
+        fetch(url, {
+            'method': 'POST',
+            'headers': {
+                'Content-type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify(
+
+                {
+                    "subject": subject_api_url,
+                    "comment": item + ' ' + comment,
+                    "data": nni_data[item]
+                }
+            )
+        }).then(function (response) {
+            window.location.replace(sample_list_url);
+        }).catch((error) => {
+            console.error('Error:', error);
+            let alert = document.createElement('div');
+            alert.setAttribute('class', 'alert alert-danger alert-dismissible show fade mx-5');
+            alert.setAttribute('role', 'alert');
+            alert.innerHTML = `
+                    Something went wrong
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>        
+                    `
+            document.getElementById('alertMsg').appendChild(alert);
+        });
+
+    })
+    }
+
+</script>
+{% endblock content %}

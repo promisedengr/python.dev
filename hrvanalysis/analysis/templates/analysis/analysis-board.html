@@ -1,0 +1,554 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% load static %}
+{% block headers %}
+<link rel="stylesheet" href="{% static 'assets/vendors/choices.js/choices.min.css' %}" />
+{% endblock headers %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3 class="capitalize">Analysis board</h3>
+                <p class="text-subtitle text-muted" id="commentText">{{ result.sample.comment }}</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class='breadcrumb-header'>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'subject_list' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a
+                                href="{% url 'subject_sample_list' result.sample.subject.pk %}">Subject</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Sample</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-{{msg.tags}} alert-dismissible fade show" role="alert">
+                {{msg}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+        {% endfor %}
+    {% endif %}
+    <div id="alertMsg"></div>
+    <div class="row">
+        <div class="col-lg-8 col-md-7 col-12 order-md-1 order-last">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+                        aria-controls="pills-home" aria-selected="true"><i data-feather="home"></i></a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="pills-timedomain-tab" data-toggle="pill" href="#pills-timedomain" role="tab"
+                        aria-controls="pills-timedomain" aria-selected="false">time domain</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="pills-freqdomain-tab" data-toggle="pill" href="#pills-freqdomain" role="tab"
+                        aria-controls="pills-freqdomain" aria-selected="false">frequency domain</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="pills-nonlinear-tab" data-toggle="pill" href="#pills-nonlinear" role="tab"
+                        aria-controls="pills-nonlinear" aria-selected="false">nonlinear</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <div class="container mb-4" id="tachogram-chart">
+                        {{ result.tachogram_plot|safe}}
+                    </div>
+
+                    <div class="container">
+                        <div class="card card-body">
+                            <div class="container">
+                                <form id="compareSampleForm">
+                                    <div class="col-md-6 mb-4">
+                                        <h6>Compare samples</h6>
+                                        <div class="form-group">
+                                            <select class="choices form-select" id="selectSample">
+                                                {% for val in result.sample.subject.samples.all %}
+                                                    {% if val != result.sample %}
+                                                        <option value="{{val.pk}}">{{ forloop.counter }}. {{ val.comment }}
+                                                        </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="comparisonParams">Select all comparison parameters</label>
+                                            <select class="choices form-select" multiple="multiple" id="comparisonParams">
+                                                <optgroup label="Parameters">
+                                                    <option value="nni_mean">NNI MEAN</option>
+                                                    <option value="sdnn">SDNN</option>
+                                                    <option value="rmssd">RMSSD</option>
+                                                    <option value="sdsd">SDSD</option>
+                                                    <option value="nn50">NN50</option>
+                                                    <option value="nn20">NN20</option>
+                                                    <option value="fft_peak">FFT PEAK</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-outline-primary" type="submit">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="container" id="radar-chart">
+                                {{result.radar_plot|safe}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-timedomain" role="tabpanel" aria-labelledby="pills-timedomain-tab">
+                    <div class="container mb-3" id="nn_histogram-chart">
+                        {{ result.nn_histogram|safe}}
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body table-responsive">
+                            <table class="table table-bordered table-hover text-uppercase">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">parameter</th>
+                                        <th scope="col">value</th>
+                                        <th scope="col">unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>nni </td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{result.parameters.nni_counter|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni mean</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{result.parameters.nni_mean|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni min</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.nni_min|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni max</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.nni_max|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hr mean</td>
+                                        <td class="text-lowercase">bpm</td>
+                                        <td class="font-weight-bold">{{ result.parameters.hr_mean|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hr min</td>
+                                        <td class="text-lowercase">bpm</td>
+                                        <td class="font-weight-bold">{{ result.parameters.hr_min|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hr max</td>
+                                        <td class="text-lowercase">bpm</td>
+                                        <td class="font-weight-bold">{{ result.parameters.hr_max|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hr std</td>
+                                        <td class="text-lowercase">bpm</td>
+                                        <td class="font-weight-bold">{{ result.parameters.hr_std|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni diff mean</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{result.parameters.nni_diff_mean|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni diff min</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{result.parameters.nni_diff_min|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nni diff max</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{result.parameters.nni_diff_max|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sdnn</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.sdnn|floatformat:3|intcomma }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>sdnn index</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{result.parameters.sdnn_index|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sdann</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.sdann|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>rmssd</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.rmssd|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sdsd</td>
+                                        <td class="text-lowercase">ms</td>
+                                        <td class="font-weight-bold">{{ result.parameters.sdsd|floatformat:3|intcomma }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>nn50</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ result.parameters.nn50|floatformat:3|intcomma }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>pnn50</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ result.parameters.pnn50|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>nn20</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ result.parameters.nn20|floatformat:3|intcomma }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>pnn20</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ result.parameters.pnn20|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">{{ custom_threshold.2 }}</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ custom_threshold.3|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">{{ custom_threshold.0 }}</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ custom_threshold.1|floatformat:3|intcomma}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>triangular index</td>
+                                        <td class="text-lowercase">-</td>
+                                        <td class="font-weight-bold">{{ result.parameters.tri_index|floatformat:3|intcomma }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="pills-freqdomain" role="tabpanel" aria-labelledby="pills-freqdomain-tab">
+                    <div class="container mb-3" id="lomb-chart">
+                        {{ result.lomb_plot|safe}}
+                    </div>
+                    <div class="container mb-3" id="fft-chart">
+                        {{ result.fft_plot|safe }}
+                    </div>
+
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <h5 class="text-center text-info">Welch's Method</h5>
+                                <table class="table table-hover table-bordered text-uppercase">
+                                    <thead>
+                                        <tr class="text-uppercase">
+                                            <th scope="col"></th>
+                                            <th scope="col">unit</th>
+                                            <th scope="col">vlf</th>
+                                            <th scope="col">lf</th>
+                                            <th scope="col">hf</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">Peak Frequencies</th>
+                                            <td class="text-lowercase">Hz</td>
+                                            <td class="font-weight-bold">{{ result.parameters.fft_peak.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_peak.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_peak.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Absolute Powers</th>
+                                            <td class="text-lowercase">ms2</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_abs.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_abs.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_abs.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Relative Powers</th>
+                                            <td>%</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_rel.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{result.parameters.fft_rel.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.fft_rel.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Logarithmic Powers</th>
+                                            <td>-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.fft_log.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.fft_log.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.fft_log.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">LF/HF Ratio</th>
+                                            <td class="font-weight-bold" colspan="4">{{ result.parameters.fft_ratio|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Total Power</th>
+                                            <td class="text-lowercase">ms2</td>
+                                            <td class="font-weight-bold" colspan="3">{{ result.parameters.fft_total|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="font-weight-bold">Configurations: </p>
+                                <ul>
+                                    <li>Resampling frequency: {{ result.parameters.fft_resampling_frequency|floatformat:3|intcomma }} Hz</li>
+                                    <li>Interpolation: {{ result.parameters.fft_interpolation }}</li>
+                                    <li>Window: {{ result.parameters.fft_window }}</li>
+                                    <li>NFFT (over entire signal): {{ result.parameters.fft_nfft|floatformat:3|intcomma }}</li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-3 table-responsive">
+                                <h5 class="text-center text-info">Lomb-Scargle Method</h5>
+                                <table class="table table-hover table-bordered text-uppercase">
+                                    <thead>
+                                        <tr class="text-uppercase">
+                                            <th scope="col"></th>
+                                            <th scope="col">unit</th>
+                                            <th scope="col">vlf</th>
+                                            <th scope="col">lf</th>
+                                            <th scope="col">hf</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">Peak Frequencies</th>
+                                            <td class="text-lowercase">Hz</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_peak.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_peak.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{  result.parameters.lomb_peak.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Absolute Powers</th>
+                                            <td class="text-lowercase">ms2</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_abs.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_abs.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_abs.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Relative Powers</th>
+                                            <td>%</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_rel.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_rel.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_rel.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Logarithmic Powers</th>
+                                            <td>-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_log.0|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_log.1|floatformat:3|intcomma }}</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_log.2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">LF/HF Ratio</th>
+                                            <td class="font-weight-bold" colspan="4">{{ result.parameters.lomb_ratio|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Total Power</th>
+                                            <td class="text-lowercase">ms2</td>
+                                            <td class="font-weight-bold" colspan="3">{{ result.parameters.lomb_total|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="font-weight-bold">Configurations: </p>
+                                <ul>
+                                    <li>Moving Average Window Size: {{ result.parameters.lomb_ma }} Hz</li>
+                                    <li>NFFT (over entire signal): {{ result.parameters.lomb_nfft|floatformat:3|intcomma }}</li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-3 table-responsive">
+                                <h5 class="text-center text-info">Selected Frequency Bands</h5>
+                                <table class="table table-sm table-bordered text-white text-uppercase">
+                                    <tbody>
+                                        <tr style="background-color: #66B032;">
+                                            <th scope="row">VLF Band</th>
+                                            <td class="text-capitalize">Hz</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_bands.vlf.0|floatformat:3|intcomma }}&#9866;{{ result.parameters.lomb_bands.vlf.1|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr style="background-color: #347B98;">
+                                            <th scope="row">LF Band</th>
+                                            <td class="text-capitalize">Hz</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_bands.lf.0|floatformat:3|intcomma }}&#9866;{{ result.parameters.lomb_bands.lf.1|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr style="background-color: #092834;">
+                                            <th scope="row">HF Band</th>
+                                            <td class="text-capitalize">Hz</td>
+                                            <td class="font-weight-bold">{{ result.parameters.lomb_bands.hf.0|floatformat:3|intcomma }}&#9866;{{result.parameters.lomb_bands.hf.1|floatformat:3|intcomma }}</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="tab-pane fade" id="pills-nonlinear" role="tabpanel" aria-labelledby="pills-nonlinear-tab">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 col-12">
+                            <div class="container" id="poincare-chart">
+                                {{ result.poincare_plot|safe}}
+                            </div>
+
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="container" id="dfa-chart">
+                                {{ result.dfa_plot|safe}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body table-responsive">
+                            <div class="mb-3">
+                                <h5 class="text-center text-info">Poincare Plot result.Parameters</h5>
+                                <table class="table table-hover table-bordered text-uppercase">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">parameter</th>
+                                            <th scope="col">value</th>
+                                            <th scope="col">unit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>SD1</td>
+                                            <td class="text-lowercase">ms</td>
+                                            <td class="font-weight-bold">{{ result.parameters.sd1|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SD2</td>
+                                            <td class="text-lowercase">ms</td>
+                                            <td class="font-weight-bold">{{ result.parameters.sd2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SD1/SD2</td>
+                                            <td class="text-lowercase">-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.sd_ratio|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ellipse Area S</td>
+                                            <td class="text-lowercase">-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.ellipse_area|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sample Entropy</td>
+                                            <td class="text-lowercase">-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.sampen|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>DFA alpha 1</td>
+                                            <td class="text-lowercase">-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.dfa_alpha1|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>DFA alpha 2</td>
+                                            <td class="text-lowercase">-</td>
+                                            <td class="font-weight-bold">{{ result.parameters.dfa_alpha2|floatformat:3|intcomma }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-4 col-md-5 col-12 order-md-2 order-first">
+            <div class="container">
+                <div class="mb-3">
+                    <a href="{% url 'result_render_pdf' result.pk %}" class="btn icon icon-left btn-outline-danger"><i
+                            data-feather="download"></i> Report</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        Data Specifications
+                    </div>
+                    <div class="card-body">
+                        <div class="result-update-form">
+                            <p>
+                                <button class="btn btn-primary btn-block" type="button" data-toggle="collapse"
+                                    data-target="#collapseAdvancedSet" aria-expanded="false"
+                                    aria-controls="collapseAdvancedSet">
+                                    Advanced Settings
+                                </button>
+                            </p>
+                            <div class="collapse" id="collapseAdvancedSet">
+                                <a class="d-none" id="apiUpdateResultEndPoint" href="{% url 'result-detail' result.pk %}"></a>
+                                <form id="updateResultForm">
+                                    <div class="form-group">
+                                        {{ form|crispy }}
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="d-flex">
+                                            <button type="submit" class="btn btn-primary btn-sm mr-1 mb-2">Save settings</button>
+                                        </div>
+        
+                                    </div>                                
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="sample-update-form">
+                            <a class="d-none" id="apiUpdateSampleEndPoint" href="{% url 'sample-detail' result.sample.pk %}"></a>
+                            <form class="form-inline" id="updateSampleForm">
+                                <div class="form-group">
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="sampleComment" class="form-label">Comment</label>
+                                        <textarea class="form-control" id="sampleComment" rows="3"></textarea>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div class="d-flex">
+                                        <button type="submit" class="btn btn-primary btn-block btn-sm mb-2">Save Comment</button>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>                
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'assets/vendors/choices.js/choices.min.js' %}"></script>
+<script src="{% static 'analysis/js/analysis-board.js' %}"></script>
+{% endblock scripts %}

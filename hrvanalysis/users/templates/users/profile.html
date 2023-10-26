@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load cloudinary %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block headers %}
+    <title>Account | HRV&nbsp;SciHub</title>
+{% endblock headers %}
+
+{% block content %}
+{% if messages %}
+{% for msg in messages %}
+    <div class="alert alert-{{msg.tags}} alert-dismissible fade show" role="alert">
+        {{msg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+{% endfor %}
+{% endif %}
+    <div class="container-fluid p-0">        
+        <div class="row mb-2 mb-xl-3">
+            <div class="col-auto d-none d-sm-block">
+                <h1 class="h3 mb-3">Account</h1>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-8 col-xl-9">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="account" role="tabpanel">
+                    <form method="POST" id="profileForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card">
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">Public info</h5>
+                            </div>
+                            <div class="card-body">
+                                
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="{{ u_form.username.id_for_label }}">Username</label>
+                                            {{ u_form.username|as_crispy_field }}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="{{ u_form.email.id_for_label }}">Email</label>
+                                            {{ u_form.email|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                                <div class="avatar">
+                                                    {% if user.profile.image %}
+                                                        <img style="width: 10em; height: 10em; object-fit: cover;" src="{{ user.profile.image.url }}" alt="Profile">
+                                                    {% else %}
+                                                        <img style="width: 10em; height: 10em; object-fit: cover;" src="{% static 'assets/images/avatar.png' %}" alt="Profile">
+                                                    {% endif %}
+                                                </div>
+                                            <div class="mt-2">
+                                                <span class="btn btn-primary" id=imgUploadBtn><i class="fas fa-upload"></i>
+                                                    Upload</span>
+                                                    <span class="">{{ p_form.image }}</span> 
+                                            </div>
+                                            <small>For best results, use an image at least 128px by
+                                                128px in .jpg format</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" id="imgSubmitBtn">Save changes</button>
+                                
+
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">Private info</h5>
+                            </div>
+                            <div class="card-body">
+                                    <div class="row">
+                                        <div class="mb-3 col-md-6">
+                                            <label class="form-label" for="{{ p_form.first_name.id_for_label }}">First
+                                                name</label>
+                                            {{ p_form.first_name|as_crispy_field }}
+                                        </div>
+                                        <div class="mb-3 col-md-6">
+                                            <label class="form-label" for="{{ p_form.last_name.id_for_label }}">Last name</label>
+                                            {{ p_form.last_name|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="{{ p_form.address.id_for_label }}">Address</label>
+                                        {{ p_form.address|as_crispy_field }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="{{ p_form.address2.id_for_label }}">Address 2</label>
+                                        {{ p_form.address2|as_crispy_field }}
+                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 col-md-6">
+                                            <label class="form-label" for="{{ p_form.city.id_for_label }}">City</label>
+                                            {{ p_form.city|as_crispy_field }}
+                                        </div>
+                                        <div class="mb-3 mb-3 col-md-6">
+                                            <label class="form-label" for="{{ p_form.country.id_for_label }}">Country</label>
+                                            {{ p_form.country|as_crispy_field }}
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                
+
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                    <div class="tab-pane fade" id="deleteAccount" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Delete Account</h5>
+
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <p><em>Are You Sure You Want To Delete Your Account?, This Action Cannot Be Undone</em></p>
+                                        
+                                        <div class="form-group">
+                                            <button name="btn_delete" class="btn btn-primary" type="submit">Yes, Delete</button>
+                                        </div>                                    
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xl-3">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Profile&nbsp;settings</h5>
+                    </div>
+
+                    <div class="list-group list-group-flush" role="tablist">
+                        <a class="list-group-item list-group-item-action active" data-toggle="list" href="#account"
+                            role="tab">
+                            Account
+                        </a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#deleteAccount"
+                            role="tab">
+                            Delete Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'users/js/users.js' %}"></script>
+{% endblock scripts %}

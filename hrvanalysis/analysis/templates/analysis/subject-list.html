@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="page-title">
+    <h4>Welcome {{ user.username }}</h4>
+    <p class="text-subtitle text-muted">Subject list</p>
+</div>
+<div>
+    <a class="d-none" id="apiCreateEndPoint" href="{% url 'subject-list' %}"></a>
+</div>
+<div id="alertMsg"></div>
+<div class="row">
+    <div class="col-md-8 col-12 order-md-1 order-last">
+        <div class="row" id="subject-container">
+        </div>
+    </div>
+    <div class="col-md-4 col-12 order-md-2 order-first">
+        <div class="subject-add-container">
+            <div class="card">
+                <div class="card-header">
+                    <p>Edit and add subjects</p>
+                </div>
+                <div class="card-body">
+                    <form id="addSubjectForm">
+                        <div class="form-group mb-3" id="subjet-name">
+                            <label for="subjet-name-id">Name</label>
+                            <input type="text" id="subjet-name-id" class="form-control">
+                        </div>
+                        <div class="form-group mb-3" id="subjet-age">
+                            <label for="subjet-age-id">Age</label>
+                            <input type="number" id="subjet-age-id" class="form-control">
+                        </div>
+                        <div class="form-group mb-3" id="subjet-gender">
+                            <label for="subjet-gender-id">Gender</label>
+                            <select class="form-control" id="subjet-gender-id">
+                                <option selected value="male">M</option>
+                                <option value="female">F</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <button type="submit" class="btn btn-outline-secondary">submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+<script src="{% static 'analysis/js/subject.js' %}"></script>
+{% endblock scripts %}
