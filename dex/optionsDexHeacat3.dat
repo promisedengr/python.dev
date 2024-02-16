@@ -1,0 +1,26 @@
+	barmen Mons	barmen Coffee shop	barmen Union	barmen Test	barmen in a bar	barmen tea shop	school cook	cook in a restaurant	merchant in a food store	merchant in a store with clothes	merchant in a pet store	baker	confectioner	hairdresser	beautician
+SKP Evaluation	mis match;needs competence improvement;a good match	mis match	mis match	a good match	mis match	needs competence improvement	mis match	mis match	needs competence improvement	a good match	needs competence improvement	mis match	mis match	mis match	mis match
+Skill appropriateness 	inappropriate;small chances;appropriate	appropriate	appropriate	appropriate	needs improvement	small chances	inappropriate	inappropriate	needs improvement	appropriate	small chances	inappropriate	inappropriate	inappropriate	inappropriate
+Available positions	small	large	medium	large	medium	small	small	medium	medium	large	small	medium	small	medium	large
+SKPvsESCO	*	5 - 10	< 5 new competences	5 - 10	5 - 10	5 - 10	>10	>10	5 - 10	5 - 10	5 - 10	>10	>10	>10	>10
+Skills	none	a few	none	none	a few	a few	none	none	none	none	none	none	none	none	none
+Languages	yes	no	yes	yes	no	no	yes	yes	yes	yes	yes	yes	yes	yes	yes
+Driving licence	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes
+Personal characteristics	a good match	a good match	a good match	a good match	needs wish adjustments	a good match	a good match	needs wish adjustments	a good match	a good match	a good match	needs wish adjustments	a good match	needs wish adjustments	a good match
+Age appropriateness	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes
+Disability appropriateness	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes
+SKP Wish	yes	yes	yes	yes	no	yes	yes	no	yes	yes	yes	no	yes	no	yes
+Job appropriateness 	appropriate	inappropriate	inappropriate	appropriate	inappropriate	appropriate	appropriate	inappropriate	appropriate	appropriate	appropriate	inappropriate	appropriate	appropriate	appropriate
+Contract type	da	da	da	da	da	da	da	da	da	da	da	da	da	da	da
+BO wishes for contract type	not important	not important	full time	not important	not important	not important	not important	not important	not important	not important	not important	not important	not important	not important	not important
+Job contract type	full time	full time	full time	*	full time	full time	full time	full time	full time	full time	full time	full time	full time	full time	full time
+Work type	very acceptable	unacceptable	unacceptable	acceptabe;very acceptable	unacceptable	very acceptable	very acceptable	unacceptable	very acceptable	very acceptable	very acceptable	unacceptable	very acceptable	very acceptable	very acceptable
+Career advance	very good match	very good match	very good match	good match;very good match	very good match	very good match	very good match	very good match	very good match	very good match	very good match	very good match	very good match	very good match	very good match
+BO career wishes	not important	not important	same	*	not important	not important	upgrade career	upgrade career	not important	not important	not important	upgrade career	upgrade career	upgrade career	upgrade career
+Job career advancement	same	same	same	same	same	same	up	up	same	same	same	up	up	up	up
+Working hours	da	ne	ne	da	ne	da	da	ne	da	da	da	ne	da	da	da
+BO working hours wishes	daily/night shift	daily shift	daily shift	daily/night shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift	daily shift
+Job working hours	daily/night shift	daily/night shift	daily/night shift	daily/night shift	daily/night shift	daily shift	daily shift	daily/night shift	daily shift	daily shift	daily shift	daily/night shift	daily shift	daily shift	daily shift
+Location	acceptable location	acceptable location	near location	near location	acceptable location	acceptable location	near location	acceptable location	acceptable location	acceptable location	acceptable location	acceptable location	acceptable location	acceptable location	near location
+MSO Upravna Enota	10 - 20 km	10 - 20 km	< 10 km	< 10 km	10 - 20 km	10 - 20 km	< 10 km	10 - 20 km	10 - 20 km	10 - 20 km	10 - 20 km	10 - 20 km	10 - 20 km	10 - 20 km	< 10 km
+BO wish location	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes
